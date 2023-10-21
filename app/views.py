@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from .forms import RegistrationForm
 
 
-def LogInView(request):
+def logInView(request):
     if request.user.is_authenticated:
         return redirect('about_us_url')
     if request.method == 'GET':
@@ -21,9 +22,23 @@ def LogInView(request):
         return redirect('log_in_url')
 
 
-def LogOutView(request):
+def logOutView(request):
     if request.user.is_authenticated:
         logout(request)
         # logout - находит связанные с юзером sessionid и csrftoken и удаляет их из БД.
     return redirect('log_in_url')
 
+
+def registrationView(request):
+    if request.method == 'GET':
+        form = RegistrationForm()
+        context = {
+            'reg_form': form
+        }
+        return render(request=request, template_name='registration.html', context=context)
+    elif request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('log_in_url')
+        return redirect('registration_url')
